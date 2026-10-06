@@ -2,7 +2,7 @@
 
 A functionality-first, low-latency video conferencing platform inspired by Zoom and Google Meet. This project skips superficial UI styling to prioritize core real-time engineering principles, peer-to-peer data streaming, and hardware media device control using the **MERN stack** and **WebRTC**.
 
-🌐 **[Live Demo Link]**
+🌐 **[Live Demo Link - https://zerodha-frontend-kch5.onrender.com ]**
 
 ## ⚙️ Core Engineering & Functionality
 
