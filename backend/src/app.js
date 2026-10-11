@@ -11,6 +11,17 @@ import userRoutes from "./routes/users.routes.js";
 import { connect } from "node:http2";
 
 const app = express();
+
+app.use(
+  cors({
+    origin: "https://v-connect-frontend-t3lx.onrender.com",
+    credentials: true,
+    methods: ["GET", "POST", "PUT", "DELETE"],
+  }),
+);
+
+app.use(express.json());
+
 const server = createServer(app);
 const io = connectToSocket(server);
 
