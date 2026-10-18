@@ -28,6 +28,10 @@ const io = connectToSocket(server);
 app.set("port", process.env.PORT || 8000);
 
 // 4. API Routes
+app.get("/", (req, res) => {
+  res.status(200).json({ message: "Server is running successfully!" });
+});
+
 app.use("/api/v1/users", userRoutes);
 
 // 5. Database & Server initialization
