@@ -14,7 +14,7 @@ import ChatIcon from "@mui/icons-material/Chat";
 import { useParams } from "react-router-dom";
 import { AuthContext } from "../contexts/AuthContext";
 
-const server_url = "https://zerodha-backend-h3nz.onrender.com/";
+const server_url = "https://v-connect-backend.onrender.com/";
 
 var connections = {};
 
