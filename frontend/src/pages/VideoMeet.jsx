@@ -111,74 +111,48 @@ export default function VideoMeetComponent() {
 
   const getPermissions = async () => {
     try {
-      console.log("Requesting camera and microphone access...");
-
-      // 1. Fetch BOTH Video and Audio simultaneously in ONE clean stream request
-      // This bypasses the asynchronous state bug entirely
-      const userMediaStream = await navigator.mediaDevices.getUserMedia({
+      const videoPermission = await navigator.mediaDevices.getUserMedia({
         video: true,
+      });
+      if (videoPermission) {
+        setVideoAvailable(true);
+        console.log("Video permission granted");
+      } else {
+        setVideoAvailable(false);
+        console.log("Video permission denied");
+      }
+
+      const audioPermission = await navigator.mediaDevices.getUserMedia({
         audio: true,
       });
-
-      if (userMediaStream) {
-        setVideoAvailable(true);
+      if (audioPermission) {
         setAudioAvailable(true);
-        console.log("Video and Audio permissions granted successfully.");
+        console.log("Audio permission granted");
+      } else {
+        setAudioAvailable(false);
+        console.log("Audio permission denied");
+      }
 
-        // 2. Assign the active stream globally for WebRTC connections
-        window.localStream = userMediaStream;
+      if (navigator.mediaDevices.getDisplayMedia) {
+        setScreenAvailable(true);
+      } else {
+        setScreenAvailable(false);
+      }
 
-        // FIX: Double-check the exact case spelling of your video Ref hook!
-        if (localVideoRef.current) {
-          localVideoRef.current.srcObject = userMediaStream;
+      if (videoAvailable || audioAvailable) {
+        const userMediaStream = await navigator.mediaDevices.getUserMedia({
+          video: videoAvailable,
+          audio: audioAvailable,
+        });
+        if (userMediaStream) {
+          window.localStream = userMediaStream;
+          if (localVideoref.current) {
+            localVideoref.current.srcObject = userMediaStream;
+          }
         }
       }
     } catch (error) {
-      console.error(
-        "Standard AV stream capture failed. Attempting fallback routing...",
-        error,
-      );
-
-      // FALLBACK ROUTING: If a user has NO webcam or NO microphone plugged in, the block above fails.
-      // We will try to capture whatever working hardware device they have active:
-      try {
-        // Try Audio Only
-        const audioOnlyStream = await navigator.mediaDevices.getUserMedia({
-          audio: true,
-          video: false,
-        });
-        setAudioAvailable(true);
-        setVideoAvailable(false);
-        window.localStream = audioOnlyStream;
-        if (localVideoRef.current)
-          localVideoRef.current.srcObject = audioOnlyStream;
-      } catch (audioErr) {
-        try {
-          // Try Video Only
-          const videoOnlyStream = await navigator.mediaDevices.getUserMedia({
-            audio: false,
-            video: true,
-          });
-          setVideoAvailable(true);
-          setAudioAvailable(false);
-          window.localStream = videoOnlyStream;
-          if (localVideoRef.current)
-            localVideoRef.current.srcObject = videoOnlyStream;
-        } catch (bothErr) {
-          console.error(
-            "User blocked permissions or has no media input devices plugged in.",
-          );
-          setVideoAvailable(false);
-          setAudioAvailable(false);
-        }
-      }
-    }
-
-    // 3. Safely evaluate system screen share features separately
-    if (navigator.mediaDevices && navigator.mediaDevices.getDisplayMedia) {
-      setScreenAvailable(true);
-    } else {
-      setScreenAvailable(false);
+      console.log(error);
     }
   };
 
