@@ -5,41 +5,47 @@ import mongoose from "mongoose";
 import { connectToSocket } from "./controllers/socketManager.js";
 import cors from "cors";
 import userRoutes from "./routes/users.routes.js";
+import dotenv from "dotenv"; // 1. Import dotenv
+
+// 2. Load environment variables from the .env file
+dotenv.config();
 
 const app = express();
 
-// 1. Define CORS ONCE with all required properties
+// 3. Define CORS ONCE with all required properties
 app.use(
   cors({
-    origin: "https://v-connect-frontend-t3lx.onrender.com",
+    origin:
+      process.env.FRONTEND_URL ||
+      "https://v-connect-frontend-t3lx.onrender.com",
     credentials: true,
     methods: ["GET", "POST", "PUT", "DELETE"],
   }),
 );
 
-// 2. Define Body Parsers ONCE
+// 4. Define Body Parsers ONCE
 app.use(express.json({ limit: "40kb" }));
 app.use(express.urlencoded({ limit: "40kb", extended: true }));
 
-// 3. Define server configuration & sockets
+// 5. Define server configuration & sockets
 const server = createServer(app);
 const io = connectToSocket(server);
 
+// Fetch the port from the environment variable, defaulting to 8000
 app.set("port", process.env.PORT || 8000);
 
-// 4. API Routes
+// 6. API Routes
 app.get("/", (req, res) => {
   res.status(200).json({ message: "Server is running successfully!" });
 });
 
 app.use("/api/v1/users", userRoutes);
 
-// 5. Database & Server initialization
+// 7. Database & Server initialization
 const start = async () => {
   try {
-    const connectionDb = await mongoose.connect(
-      "mongodb+srv://baaditya284_db_user:oUMPi7CIcv6bkAWK@cluster0.1gddngt.mongodb.net/",
-    );
+    // 8. Dynamic secure connection
+    const connectionDb = await mongoose.connect(process.env.MONGO_URI);
     console.log(`MONGO Connected DB Host: ${connectionDb.connection.host}`);
 
     server.listen(app.get("port"), () => {
@@ -47,6 +53,7 @@ const start = async () => {
     });
   } catch (error) {
     console.error("Database connection error: ", error);
+    process.exit(1); // Stop the server if the DB connection fails
   }
 };
 

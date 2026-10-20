@@ -136,7 +136,6 @@ export default function VideoMeetComponent() {
       if (navigator.mediaDevices.getDisplayMedia) {
         setScreenAvailable(true);
       } else {
-        setScreenAvailable(false);
       }
 
       if (videoAvailable || audioAvailable) {
